@@ -2094,11 +2094,13 @@ def get_reflected_SH(nlevel, nwno, numg, numt, dtau, tau, w0, cosb, gcos2, ftau_
 
             if rayleigh==1 and heng_compare==0:
                 for l in range(1,stream):
-                    w_multi[l] *= ftau_cld
-                    w_single[l] *= ftau_cld
+                    #w_multi[l] *= ftau_cld
+                    #w_single[l] *= ftau_cld
                     if l==2:    
-                        w_multi[2] = ftau_cld*w_multi[2] + 0.5*ftau_ray
-                        w_single[2] = ftau_cld*w_single[2] + 0.5*ftau_ray
+                        #w_multi[2] = ftau_cld*w_multi[2] + 0.5*ftau_ray
+                        #w_single[2] = ftau_cld*w_single[2] + 0.5*ftau_ray
+                        w_multi[2] = w_multi[2] + 0.5*ftau_ray
+                        w_single[2] = w_single[2] + 0.5*ftau_ray
                 if single_form==0: 
                     p_single = ftau_cld*p_single + ftau_ray*(0.75*(1+cos_theta**2.0))
 
