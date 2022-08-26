@@ -2068,10 +2068,12 @@ def get_reflected_SH(nlevel, nwno, numg, numt, dtau, tau, w0, cosb, gcos2, ftau_
             elif single_phase==2 or single_phase==3:#'TTHG':
                 #uses the Two term Henyey-Greenstein function
                 for l in range(1,stream):
-                    w_multi[l,:,:] = (2*l+1) * (f*(g_forward**l - ff1) / (1 - ff1) 
-                                        + (1-f)*(g_back**l - ff2) / (1 - ff1))
-                    w_single[l,:,:] = (2*l+1) * (f*(g_forward**l - ff1) / (1 - ff2) 
-                                        + (1-f)*(g_back**l - ff2) / (1 - ff2))
+                    #w_multi[l,:,:] = (2*l+1) * (f*(g_forward**l - ff1) / (1 - ff1) 
+                    #                    + (1-f)*(g_back**l - ff2) / (1 - ff1))
+                    #w_single[l,:,:] = (2*l+1) * (f*(g_forward**l - ff1) / (1 - ff2) 
+                    #                    + (1-f)*(g_back**l - ff2) / (1 - ff2))
+                    w_multi[l,:,:] = (2*l+1) * (cosb_og**l - ff) / (1 - ff)
+                    w_single[l,:,:] = (2*l+1) * (cosb_og**l -  ff) / (1-ff)
 
 
                 # OG single_form calculation
