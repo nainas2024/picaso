@@ -3074,6 +3074,13 @@ def setup_2_stream_banded(nlayer, nwno, w0, b_top, b_surface, surf_reflect, ubar
     Mb[1,1,:] = Q2[0,:]
     B[0,:] = b_top - zmn_down[0,:]
 
+    #   last row: BC 4
+    n = nlayer-1
+    Mb[3, 2*nlayer-2,:] = Q2mn[n,:] - surf_reflect*Q1mn[n,:]
+    Mb[2, 2*nlayer-1,:] = Q1pl[n,:] - surf_reflect*Q2pl[n,:]
+    B[2*nlayer-1,:] = b_surface - zpl_up[n,:] + surf_reflect * zmn_up[n,:]
+
+    #   fill remaining rows of matrix
     Mb[0,3::2,:] = -Q2[1:,:]
     Mb[1,2::2,:] = -Q1[1:,:]
     Mb[1,3::2,:] = -Q1[1:,:]
@@ -3085,6 +3092,7 @@ def setup_2_stream_banded(nlayer, nwno, w0, b_top, b_surface, surf_reflect, ubar
     B[1:-1:2,:] = zmn_down[1:,:] - zmn_up[:-1,:]
     B[2::2,:] = zpl_down[1:,:] - zpl_up[:-1,:]
 
+    #   fill rows of A_int (add reference from paper)
     nn = np.arange(2*nlayer)
     indcs = nn[::2]
     k = 0
@@ -3102,12 +3110,6 @@ def setup_2_stream_banded(nlayer, nwno, w0, b_top, b_surface, surf_reflect, ubar
         expdtau = exp(-dtau/ubar1)
         N_int[::2,:] = (1-w0) * ubar1 / a[0] * (B0 *(1-expdtau) + B1*(ubar1 - (dtau+ubar1)*expdtau)) #* 2*pi
         N_int[1::2,:] = (1-w0) * ubar1 / a[0] * ( B1*(1-expdtau) / a[1]) #* 2*pi
-
-    #   last row: BC 4
-    n = nlayer-1
-    Mb[3, 2*nlayer-2,:] = Q2mn[n,:] - surf_reflect*Q1mn[n,:]
-    Mb[2, 2*nlayer-1,:] = Q1pl[n,:] - surf_reflect*Q2pl[n,:]
-    B[2*nlayer-1,:] = b_surface - zpl_up[n,:] + surf_reflect * zmn_up[n,:]
 
     F_bot = zeros((2*nlayer, nwno))
     G_bot = zeros(nwno)
@@ -3344,6 +3346,7 @@ def setup_4_stream_banded(nlayer, nwno, w0, b_top, b_surface, b_surface_SH4, sur
     F = zeros((4*nlevel, 4*nlayer, nwno))
     G = zeros((4*nlevel, nwno))
 
+    #   TOA boundary conditions
     Mb[5,0,:] = p1mn[0,:]
     Mb[5,1,:] = q1pl[0,:]
     Mb[4,1,:] = p1pl[0,:]
@@ -3355,6 +3358,20 @@ def setup_4_stream_banded(nlayer, nwno, w0, b_top, b_surface, b_surface_SH4, sur
 
     B[0,:] = b_top - z1mn_down[0,:]
     B[1,:] = -b_top/4 - z2mn_down[0,:]
+
+    #   BOA boundary conditions
+    n = nlayer-1
+    Mb[5,4*nlayer-2,:] = f22[n,:] - surf_reflect*f02[n,:]
+    Mb[5,4*nlayer-1,:] = f33[n,:] - surf_reflect*f13[n,:]
+    Mb[4,4*nlayer-1,:] = f23[n,:] - surf_reflect*f03[n,:]
+    Mb[6,4*nlayer-3,:] = f21[n,:] - surf_reflect*f01[n,:]
+    Mb[6,4*nlayer-2,:] = f32[n,:] - surf_reflect*f12[n,:]
+    Mb[7,4*nlayer-4,:] = f20[n,:] - surf_reflect*f00[n,:]
+    Mb[7,4*nlayer-3,:] = f31[n,:] - surf_reflect*f11[n,:]
+    Mb[8,4*nlayer-4,:] = f30[n,:] - surf_reflect*f10[n,:]
+
+    B[4*nlayer-2,:] = b_surface - z1pl_up[n,:] + surf_reflect*z1mn_up[n,:]
+    B[4*nlayer-1,:] = b_surface_SH4 - z2pl_up[n,:] + surf_reflect*z2mn_up[n,:]
 
     Mb[5,2:-4:4,:] = f02[:-1,:]
     Mb[5,3:-4:4,:] = f13[:-1,:]
@@ -3431,19 +3448,6 @@ def setup_4_stream_banded(nlayer, nwno, w0, b_top, b_surface, b_surface_SH4, sur
     N_int[1::4,:] = N1
     N_int[2::4,:] = N2
     N_int[3::4,:] = N3
-
-    n = nlayer-1
-    Mb[5,4*nlayer-2,:] = f22[n,:] - surf_reflect*f02[n,:]
-    Mb[5,4*nlayer-1,:] = f33[n,:] - surf_reflect*f13[n,:]
-    Mb[4,4*nlayer-1,:] = f23[n,:] - surf_reflect*f03[n,:]
-    Mb[6,4*nlayer-3,:] = f21[n,:] - surf_reflect*f01[n,:]
-    Mb[6,4*nlayer-2,:] = f32[n,:] - surf_reflect*f12[n,:]
-    Mb[7,4*nlayer-4,:] = f20[n,:] - surf_reflect*f00[n,:]
-    Mb[7,4*nlayer-3,:] = f31[n,:] - surf_reflect*f11[n,:]
-    Mb[8,4*nlayer-4,:] = f30[n,:] - surf_reflect*f10[n,:]
-
-    B[4*nlayer-2,:] = b_surface - z1pl_up[n,:] + surf_reflect*z1mn_up[n,:]
-    B[4*nlayer-1,:] = b_surface_SH4 - z2pl_up[n,:] + surf_reflect*z2mn_up[n,:]
 
     F_bot[-4,:] = f20[-1,:]
     F_bot[-3,:] = f21[-1,:]
