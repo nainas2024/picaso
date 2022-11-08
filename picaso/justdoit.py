@@ -223,16 +223,39 @@ def picaso(bundle,opacityclass, dimension = '1d',calculation='reflected', full_o
                 nlevel = atm.c.nlevel
 
                 if rt_method == 'SH':
+                    filename = 'inputs_SH2.pk'
+                    pk.dump({'nlevel':nlevel, 'nwno':nwno, 'ng':ng, 'nt':nt, 
+                        'dtau':DTAU[:,:,ig], 'tau':TAU[:,:,ig], 'w0':W0[:,:,ig], 'cosb':COSB[:,:,ig], 
+                        'ftcld':ftau_cld[:,:,ig],'ftray': ftau_ray[:,:,ig],'f_deltaM': f_deltaM[:,:,ig],
+                        'dtau_og':DTAU_OG[:,:,ig], 'tau_og':TAU_OG[:,:,ig], 'w0_og':W0_OG[:,:,ig], 'cosb_og':COSB_OG[:,:,ig], 
+                        'surf_reflect':atm.surf_reflect, 'ubar0':ubar0, 'ubar1':ubar1, 'costheta':cos_theta, 'F0PI':F0PI, 
+                        'w_single_form':w_single_form, 
+                        'w_single_form':w_single_form, 'w_multi_form':w_multi_form, 'psingle_form': psingle_form, 
+                        'w_single_rayleigh':w_single_rayleigh, 'w_multi_rayleigh':w_multi_rayleigh, 
+                        'psingle_rayleigh':psingle_rayleigh,
+                        'frac_a':frac_a, 'frac_b':frac_b, 'frac_c':frac_c, 'constant_back':constant_back, 
+                        'constant_forward':constant_forward, 'dim':dimension, 'stream':stream,
+                        'b_top': b_top}, open(filename,'wb'), protocol=2)
                     (xint, flux_out, intensity)  = get_reflected_SH(nlevel, nwno, ng, nt, 
-                                    DTAU[:,:,ig], TAU[:,:,ig], W0[:,:,ig], COSB[:,:,ig], 
-                                    ftau_cld[:,:,ig], ftau_ray[:,:,ig], f_deltaM[:,:,ig],
-                                    DTAU_OG[:,:,ig], TAU_OG[:,:,ig], W0_OG[:,:,ig], COSB_OG[:,:,ig], 
-                                    atm.surf_reflect, ubar0, ubar1, cos_theta, F0PI, 
-                                    w_single_form, w_multi_form, psingle_form, 
-                                    w_single_rayleigh, w_multi_rayleigh, psingle_rayleigh,
-                                    frac_a, frac_b, frac_c, constant_back, constant_forward, 
-                                    stream, b_top=b_top, single_form=single_form) 
+                                                DTAU[:,:,ig], TAU[:,:,ig], W0[:,:,ig], COSB[:,:,ig], 
+                                                ftau_cld[:,:,ig], ftau_ray[:,:,ig], f_deltaM[:,:,ig],
+                                                DTAU_OG[:,:,ig], TAU_OG[:,:,ig], W0_OG[:,:,ig], COSB_OG[:,:,ig], 
+                                                atm.surf_reflect, ubar0, ubar1, cos_theta, F0PI, 
+                                                w_single_form, w_multi_form, psingle_form, 
+                                                w_single_rayleigh, w_multi_rayleigh, psingle_rayleigh,
+                                                frac_a, frac_b, frac_c, constant_back, constant_forward, 
+                                                stream, b_top=b_top, single_form=single_form) 
                 else:
+                    filename = 'inputs_picaso.pk'
+                    pk.dump({'nlevel':nlevel, 'wno':wno, 'nwno':nwno, 'ng':ng, 'nt':nt, 
+                        'dtau':DTAU[:,:,ig], 'tau':TAU[:,:,ig], 'w0':W0[:,:,ig], 'cosb':COSB[:,:,ig], 'gcos2':GCOS2[:,:,ig],
+                        'ftcld':ftau_cld[:,:,ig],'ftray': ftau_ray[:,:,ig],
+                        'dtau_og':DTAU_OG[:,:,ig], 'tau_og':TAU_OG[:,:,ig], 'w0_og':W0_OG[:,:,ig], 'cosb_og':COSB_OG[:,:,ig], 
+                        'surf_reflect':atm.surf_reflect, 'ubar0':ubar0, 'ubar1':ubar1, 'costheta':cos_theta, 'F0PI':F0PI, 
+                        'single_phase':single_phase, 'multi_phase':multi_phase, 
+                        'frac_a':frac_a, 'frac_b':frac_b, 'frac_c':frac_c, 'constant_back':constant_back, 
+                        'constant_forward':constant_forward, 'dim':dimension, 'stream':stream,
+                        'b_top': b_top}, open(filename,'wb'), protocol=2)
                     #getting intensities, not fluxes (which is why second return is null)
                     xint = get_reflected_1d(nlevel, wno,nwno,ng,nt,
                                     DTAU[:,:,ig], TAU[:,:,ig], W0[:,:,ig], COSB[:,:,ig],

@@ -2642,7 +2642,7 @@ def get_reflected_SH(nlevel, nwno, numg, numt, dtau, tau, w0, cosb, ftau_cld, ft
                 g_back = constant_back*cosb_og
                 f = frac_a + frac_b*g_back**frac_c
                 f_deltaM_ = f_deltaM
-                f_deltaM_ *= (f*constant_forward**stream + (1-f)*constant_back**stream)
+                f_deltaM_ = f_deltaM_ * (f*constant_forward**stream + (1-f)*constant_back**stream)
                 for l in range(1,stream):
                     w = (2*l+1) * (f*g_forward**l + (1-f)*g_back**l)
                     if w_single_form==0:
@@ -3064,6 +3064,7 @@ def setup_2_stream_banded(nlayer, nwno, w0, b_top, b_surface, surf_reflect, ubar
     Mb = zeros((5, 2*nlayer, nwno))
     B = zeros((2*nlayer, nwno))
     A_int = zeros((2*nlayer, 2*nlayer, nwno))
+    A_new = zeros((2*nlayer, 2*nlayer, nwno))
     N_int = zeros((2*nlayer, nwno))
     nlevel = nlayer+1
     F = zeros((2*nlevel, 2*nlayer, nwno))
@@ -3093,15 +3094,26 @@ def setup_2_stream_banded(nlayer, nwno, w0, b_top, b_surface, surf_reflect, ubar
     B[2::2,:] = zpl_down[1:,:] - zpl_up[:-1,:]
 
     #   fill rows of A_int (add reference from paper)
-    nn = np.arange(2*nlayer)
-    indcs = nn[::2]
-    k = 0
-    for i in indcs:
-        A_int[i,i,:] = exptrm_alp[k,:]
-        A_int[i,i+1,:] = exptrm_bet[k,:]
-        A_int[i+1,i,:] = (-q * exptrm_alp)[k,:]
-        A_int[i+1,i+1,:] = (q * exptrm_bet)[k,:]
-        k = k+1
+    #nn = np.arange(2*nlayer)
+    #indcs = nn[::2]
+    #k = 0
+    #for i in indcs:
+    #    A_int[i,i,:] = exptrm_alp[k,:]
+    #    A_int[i,i+1,:] = exptrm_bet[k,:]
+    #    A_int[i+1,i,:] = (-q * exptrm_alp)[k,:]
+    #    A_int[i+1,i+1,:] = (q * exptrm_bet)[k,:]
+    #    k = k+1
+
+    nn = 2*nlayer
+    NN = 2*nn+2
+    a_int = A_int.reshape(nn*nn, A_int.shape[2])
+
+    a_int[::NN,:] = exptrm_alp
+    a_int[1::NN,:] = exptrm_bet
+    a_int[nn::NN,:] = (-q * exptrm_alp)
+    a_int[nn+1::NN,:] = (q * exptrm_bet)
+
+    A_int = a_int.reshape(A_int.shape)
 
     if calculation == 0 or calculation == 2: # reflected or exponential thermal
         N_int[::2,:] = eta[0] * expon1
